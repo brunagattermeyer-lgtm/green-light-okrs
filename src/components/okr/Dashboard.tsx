@@ -10,6 +10,8 @@ import KrListModal from '@/components/okr/KrListModal';
 import KrDetailModal from '@/components/okr/KrDetailModal';
 import AllActionsModal from '@/components/okr/AllActionsModal';
 import OkrCharts from '@/components/okr/OkrCharts';
+import DeadlineAlerts from '@/components/okr/DeadlineAlerts';
+import ActivityLogSidebar from '@/components/okr/ActivityLogSidebar';
 
 const Dashboard: React.FC = () => {
   const { actionStates, chipStates, loading } = useOkrState();
@@ -19,6 +21,8 @@ const Dashboard: React.FC = () => {
   const [showKrList, setShowKrList] = useState(false);
   const [showAllActions, setShowAllActions] = useState(false);
   const [activeKr, setActiveKr] = useState<KrKey | null>(null);
+  const [showLog, setShowLog] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   if (loading) {
     return (
@@ -32,13 +36,6 @@ const Dashboard: React.FC = () => {
   }
 
   const overall = calcOverallProgress(actionStates, chipStates);
-  const mainActions = ACTIONS.filter(a => !a.sub);
-  const doneMainActions = mainActions.filter(a => {
-    if (a.recurrent && a.chips) {
-      return a.chips.every((_, i) => chipStates[`${a.id}_${i}`]);
-    }
-    return !!actionStates[a.id];
-  }).length;
 
   return (
     <div className="min-h-screen bg-okr-bg">
@@ -49,6 +46,27 @@ const Dashboard: React.FC = () => {
           <button onClick={signOut} className="px-3 py-1 rounded bg-okr-bl hover:bg-okr-bo transition-colors text-okr-mi">
             Sair
           </button>
+          <div className="relative">
+            <button
+              onClick={() => setShowMenu(!showMenu)}
+              className="px-2 py-1 rounded bg-okr-bl hover:bg-okr-bo transition-colors text-okr-mi text-sm font-bold"
+            >
+              ⋯
+            </button>
+            {showMenu && (
+              <>
+                <div className="fixed inset-0 z-30" onClick={() => setShowMenu(false)} />
+                <div className="absolute right-0 top-full mt-1 bg-okr-su border border-okr-bl rounded-lg shadow-modal z-40 min-w-[160px]">
+                  <button
+                    onClick={() => { setShowLog(true); setShowMenu(false); }}
+                    className="w-full text-left px-4 py-2.5 text-xs text-okr-dk hover:bg-okr-bl transition-colors rounded-lg"
+                  >
+                    📋 Mostrar log
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Header */}
@@ -66,24 +84,22 @@ const Dashboard: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
           <MetricCard label="OBJETIVOS" value="2" sub="Confiabilidade · Experiência" hint="→ Ver objetivos" onClick={() => setShowObjetivos(true)} />
           <MetricCard label="RESULTADOS-CHAVE" value="4" sub="Horas · Retificações · CES · NPS" hint="→ Ver resultados-chave" onClick={() => setShowKrList(true)} />
-          <MetricCard label="AÇÕES TOTAIS" value={String(mainActions.length)} sub={`${doneMainActions} concluídas`} hint="→ Ver todas as ações" onClick={() => setShowAllActions(true)} />
+          <MetricCard label="AÇÕES TOTAIS" value={String(overall.actionCount)} sub={`${overall.actionDone} concluídas`} hint="→ Ver todas as ações" onClick={() => setShowAllActions(true)} />
           <div className="bg-okr-dk rounded-lg p-[18px_20px] shadow-card">
             <div className="text-[11px] font-medium text-[#5fa867] uppercase tracking-wider mb-1.5">PROGRESSO GERAL</div>
-            <div className="text-[28px] font-semibold text-[#a8e89c] leading-none font-mono">{overall.percent}%</div>
-            <div className="text-xs text-[#6b9b73] mt-1">{overall.done.toFixed(1)} de {overall.total.toFixed(1)} unidades concluídas</div>
+            <div className="text-[28px] font-semibold text-[#a8e89c] leading-none">{overall.percent}%</div>
+            <div className="text-xs text-[#6b9b73] mt-1">{overall.actionDone} de {overall.actionCount} ações concluídas</div>
           </div>
         </div>
+
+        {/* Deadline Alerts */}
+        <DeadlineAlerts onOpenArea={setActiveArea} />
 
         {/* KR Progress */}
         <SectionLabel>Progresso por resultado-chave — clique para ver as ações vinculadas</SectionLabel>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 mb-8">
           {KRS.map(kr => {
             const p = calcProgressByKr(kr.key, actionStates, chipStates);
-            const krActions = ACTIONS.filter(a => a.kr === kr.key && !a.sub);
-            const doneKrActions = krActions.filter(a => {
-              if (a.recurrent && a.chips) return a.chips.every((_, i) => chipStates[`${a.id}_${i}`]);
-              return !!actionStates[a.id];
-            }).length;
             return (
               <button
                 key={kr.key}
@@ -92,12 +108,12 @@ const Dashboard: React.FC = () => {
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="bg-okr-dk text-[#a8e89c] text-[10px] font-medium px-2.5 py-0.5 rounded-full">{kr.name}</span>
-                  <span className="font-mono text-[22px] text-okr-dk">{p.percent}%</span>
+                  <span className="text-[22px] text-okr-dk">{p.percent}%</span>
                 </div>
                 <p className="text-[13px] font-medium text-okr-dk mb-1">{kr.fullName}</p>
                 <p className="text-[11px] text-okr-mi mb-2">Objetivo {kr.objetivo} · Meta: {kr.meta}</p>
                 <ProgressBar percent={p.percent} fillColor={kr.fillColor} height={8} />
-                <p className="text-[11px] text-okr-lt mt-2">{doneKrActions} de {krActions.length} ações concluídas</p>
+                <p className="text-[11px] text-okr-lt mt-2">{p.actionDone} de {p.actionCount} ações concluídas</p>
                 <p className="text-[10px] text-okr-fo mt-1 flex items-center gap-1">→ Ver ações vinculadas</p>
               </button>
             );
@@ -107,13 +123,8 @@ const Dashboard: React.FC = () => {
         {/* Area Progress */}
         <SectionLabel>Progresso por área — clique para gerenciar ações</SectionLabel>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
-          {AREAS.map(area => {
+          {AREAS.filter(a => a.key !== 'todos').map(area => {
             const p = calcProgressByArea(area.key, actionStates, chipStates);
-            const areaMainActions = ACTIONS.filter(a => a.area === area.key && !a.sub);
-            const doneAreaActions = areaMainActions.filter(a => {
-              if (a.recurrent && a.chips) return a.chips.every((_, i) => chipStates[`${a.id}_${i}`]);
-              return !!actionStates[a.id];
-            }).length;
             return (
               <button
                 key={area.key}
@@ -124,8 +135,8 @@ const Dashboard: React.FC = () => {
                   <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: area.color }} />
                   <span className="text-sm font-medium text-okr-dk">{area.name}</span>
                 </div>
-                <div className="font-mono text-lg text-okr-dk mb-1">{p.percent}%</div>
-                <p className="text-[11px] text-okr-lt mb-2">{doneAreaActions} de {areaMainActions.length} ações concluídas</p>
+                <div className="text-lg text-okr-dk mb-1">{p.percent}%</div>
+                <p className="text-[11px] text-okr-lt mb-2">{p.actionDone} de {p.actionCount} ações concluídas</p>
                 <ProgressBar percent={p.percent} fillColor={area.color} height={5} />
                 <p className="text-[10px] text-okr-fo mt-2">→ Gerenciar ações</p>
               </button>
@@ -166,7 +177,7 @@ const Dashboard: React.FC = () => {
             <tbody>
               {GLOSSARIO.map((g, i) => (
                 <tr key={g.termo} className={i > 0 ? 'border-t border-okr-bl' : ''}>
-                  <td className="px-4 py-3 font-mono text-xs font-bold text-okr-dk w-32 align-top">{g.termo}</td>
+                  <td className="px-4 py-3 text-xs font-bold text-okr-dk w-32 align-top">{g.termo}</td>
                   <td className="px-4 py-3 text-[13px] text-okr-mi">{g.def}</td>
                 </tr>
               ))}
@@ -186,6 +197,7 @@ const Dashboard: React.FC = () => {
       <KrListModal open={showKrList} onClose={() => setShowKrList(false)} />
       <KrDetailModal krKey={activeKr} open={!!activeKr} onClose={() => setActiveKr(null)} />
       <AllActionsModal open={showAllActions} onClose={() => setShowAllActions(false)} />
+      <ActivityLogSidebar open={showLog} onClose={() => setShowLog(false)} />
     </div>
   );
 };

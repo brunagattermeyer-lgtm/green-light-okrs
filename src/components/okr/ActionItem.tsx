@@ -61,13 +61,32 @@ const ActionItem: React.FC<ActionItemProps> = ({ action, editable = false, areaC
                 i
               </button>
               {showTooltip && (
-                <div className="absolute z-50 left-6 top-0 w-[280px] bg-okr-dk text-[#c8eebc] text-xs p-3 rounded-lg shadow-modal">
+                <div className="absolute z-50 left-6 top-0 w-[320px] bg-okr-dk text-[#c8eebc] text-xs p-3 rounded-lg shadow-modal">
                   <p><strong>Responsável:</strong> {action.resp}</p>
                   <p><strong>Prazo:</strong> {action.prazo}</p>
                   <p><strong>Área:</strong> {area?.name}</p>
-                  <p><strong>KR:</strong> {kr?.name}</p>
-                  {action.sub && <p className="mt-1 text-[10px] opacity-75">Subtask — peso 0,5</p>}
+                  <p><strong>KR:</strong> {kr?.fullName || kr?.name}</p>
+                  {action.sub && <p className="mt-1 text-[10px] opacity-75">Subtask — contribui para o progresso da ação principal</p>}
                   {action.recurrent && <p className="mt-1 text-[10px] opacity-75">Ação recorrente — progresso por chips</p>}
+                  {action.direcionamento && (
+                    <div className="mt-2 pt-2 border-t border-[#2a4a1a]">
+                      <p className="text-[10px] uppercase tracking-wider text-[#7dcc6d] font-semibold mb-1">Direcionamento Operacional</p>
+                      <p className="text-[11px] leading-relaxed">{action.direcionamento}</p>
+                    </div>
+                  )}
+                  {action.expectativas && action.expectativas.length > 0 && (
+                    <div className="mt-2 pt-2 border-t border-[#2a4a1a]">
+                      <p className="text-[10px] uppercase tracking-wider text-[#7dcc6d] font-semibold mb-1">Expectativas / Critérios</p>
+                      <ul className="space-y-0.5">
+                        {action.expectativas.map((e, i) => (
+                          <li key={i} className="text-[11px] leading-relaxed flex items-start gap-1.5">
+                            <span className="text-[#7dcc6d] mt-0.5">·</span>
+                            <span>{e}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -89,7 +108,6 @@ const ActionItem: React.FC<ActionItemProps> = ({ action, editable = false, areaC
         </div>
       </div>
 
-      {/* Recurrent chips */}
       {action.recurrent && action.chips && (
         <div className="mt-2 ml-8">
           <p className="text-[10px] text-okr-lt mb-1.5">{action.chipLabel}</p>
@@ -102,7 +120,7 @@ const ActionItem: React.FC<ActionItemProps> = ({ action, editable = false, areaC
                   key={chipKey}
                   onClick={editable ? () => toggleChip(chipKey) : undefined}
                   disabled={!editable}
-                  className={`inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-mono border transition-colors ${
+                  className={`inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] border transition-colors ${
                     chipDone
                       ? 'bg-okr-fo text-white border-okr-fo'
                       : 'bg-okr-su text-okr-dk border-okr-bo hover:border-okr-fo'

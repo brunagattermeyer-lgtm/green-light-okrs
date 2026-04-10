@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ACTIONS, AREAS, AreaKey } from '@/data/okrData';
 import { useOkrState } from '@/contexts/OkrStateContext';
 import { calcProgressByArea } from '@/lib/progressCalc';
@@ -18,7 +18,6 @@ const AreaModal: React.FC<AreaModalProps> = ({ area, open, onClose }) => {
   const actions = ACTIONS.filter(a => a.area === area);
   const progress = calcProgressByArea(area, actionStates, chipStates);
 
-  // Group by KR
   const krGroups: Record<string, typeof actions> = {};
   actions.forEach(a => {
     if (!krGroups[a.kr]) krGroups[a.kr] = [];
@@ -26,10 +25,10 @@ const AreaModal: React.FC<AreaModalProps> = ({ area, open, onClose }) => {
   });
 
   const krLabels: Record<string, string> = {
-    horas: 'Horas em rotinas',
-    retificacoes: 'Retificações ≤ 1%',
-    ces: 'CES ≥ 4,0',
-    nps: 'NPS ≥ 75',
+    horas: 'Reduzir em 10% o total de horas dedicadas em rotinas',
+    retificacoes: '% retificações ≤ 1%',
+    ces: 'Manter o CES do trimestre em 4,0 pontos',
+    nps: 'NPS >= 75',
   };
 
   return (
@@ -41,8 +40,8 @@ const AreaModal: React.FC<AreaModalProps> = ({ area, open, onClose }) => {
     >
       <div className="mb-5">
         <div className="flex items-center gap-3 mb-2">
-          <span className="font-mono text-2xl font-medium text-okr-dk">{progress.percent}%</span>
-          <span className="text-sm text-okr-mi">{progress.done.toFixed(1)} de {progress.total.toFixed(1)} unidades concluídas</span>
+          <span className="text-2xl font-medium text-okr-dk">{progress.percent}%</span>
+          <span className="text-sm text-okr-mi">{progress.actionDone} de {progress.actionCount} ações concluídas</span>
         </div>
         <ProgressBar percent={progress.percent} fillColor={areaInfo.color} />
       </div>

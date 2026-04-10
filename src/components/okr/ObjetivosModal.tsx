@@ -1,5 +1,5 @@
 import React from 'react';
-import { OBJETIVOS, KRS } from '@/data/okrData';
+import { OBJETIVOS } from '@/data/okrData';
 import Modal from './Modal';
 
 const ObjetivosModal: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onClose }) => (
@@ -7,13 +7,12 @@ const ObjetivosModal: React.FC<{ open: boolean; onClose: () => void }> = ({ open
     <div className="space-y-4">
       {OBJETIVOS.map(obj => (
         <div key={obj.num} className="border border-okr-bl rounded-xl p-5">
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2 mb-3">
             <span className="bg-okr-dk text-[#a8e89c] text-[10px] font-medium px-2 py-0.5 rounded-full">
               Objetivo {obj.num}
             </span>
-            <span className="text-sm font-semibold text-okr-dk">{obj.name}</span>
           </div>
-          <p className="text-[13px] text-okr-mi mb-3">{obj.desc}</p>
+          <p className="text-sm font-semibold text-okr-dk mb-4">{obj.name}</p>
           <div className="text-[11px] font-medium text-okr-lt uppercase tracking-wider mb-2">KRs vinculados</div>
           <div className="flex flex-wrap gap-1.5">
             {obj.krLabels.map(label => (
