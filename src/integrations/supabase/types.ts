@@ -14,7 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      action_states: {
+        Row: {
+          action_id: string
+          id: string
+          is_done: boolean | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          action_id: string
+          id?: string
+          is_done?: boolean | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          action_id?: string
+          id?: string
+          is_done?: boolean | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      chip_states: {
+        Row: {
+          chip_key: string
+          id: string
+          is_done: boolean | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          chip_key: string
+          id?: string
+          is_done?: boolean | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          chip_key?: string
+          id?: string
+          is_done?: boolean | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
