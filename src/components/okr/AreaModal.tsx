@@ -25,9 +25,9 @@ const AreaModal: React.FC<AreaModalProps> = ({ area, open, onClose }) => {
   });
 
   const krLabels: Record<string, string> = {
-    horas: 'Reduzir em 10% o total de horas dedicadas em rotinas',
-    retificacoes: '% retificações ≤ 1%',
-    ces: 'Manter o CES do trimestre em 4,0 pontos',
+    horas: 'REDUZIR EM 10% O TOTAL DE HORAS DEDICADAS EM ROTINAS',
+    retificacoes: '% RETIFICAÇÕES ≤ 1%',
+    ces: 'MANTER O CES DO TRIMESTRE EM 4,0 PONTOS',
     nps: 'NPS >= 75',
   };
 
@@ -39,11 +39,23 @@ const AreaModal: React.FC<AreaModalProps> = ({ area, open, onClose }) => {
       titleIcon={<span className="w-3 h-3 rounded-full inline-block" style={{ backgroundColor: areaInfo.color }} />}
     >
       <div className="mb-5">
-        <div className="flex items-center gap-3 mb-2">
-          <span className="text-2xl font-medium text-okr-dk">{progress.percent}%</span>
-          <span className="text-sm text-okr-mi">{progress.actionDone} de {progress.actionCount} ações concluídas</span>
+        <div className="flex items-center gap-6 mb-3">
+          <div className="text-center">
+            <div className="text-2xl font-semibold text-okr-dk">{progress.actionCount}</div>
+            <div className="text-[10px] text-okr-lt uppercase tracking-wider">Ações</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-semibold text-okr-dk">{progress.actionDone}</div>
+            <div className="text-[10px] text-okr-lt uppercase tracking-wider">Concluídas</div>
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] text-okr-mi">Progresso</span>
+              <span className="text-sm font-medium text-okr-dk">{progress.percent}%</span>
+            </div>
+            <ProgressBar percent={progress.percent} fillColor="#005216" height={8} />
+          </div>
         </div>
-        <ProgressBar percent={progress.percent} fillColor={areaInfo.color} />
       </div>
 
       {Object.entries(krGroups).map(([kr, krActions]) => (

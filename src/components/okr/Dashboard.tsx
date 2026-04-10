@@ -61,7 +61,7 @@ const Dashboard: React.FC = () => {
                     onClick={() => { setShowLog(true); setShowMenu(false); }}
                     className="w-full text-left px-4 py-2.5 text-xs text-okr-dk hover:bg-okr-bl transition-colors rounded-lg"
                   >
-                    📋 Mostrar log
+                    Mostrar log
                   </button>
                 </div>
               </>
@@ -82,10 +82,10 @@ const Dashboard: React.FC = () => {
 
         {/* Metric cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
-          <MetricCard label="OBJETIVOS" value="2" sub="Confiabilidade · Experiência" hint="→ Ver objetivos" onClick={() => setShowObjetivos(true)} />
-          <MetricCard label="RESULTADOS-CHAVE" value="4" sub="Horas · Retificações · CES · NPS" hint="→ Ver resultados-chave" onClick={() => setShowKrList(true)} />
-          <MetricCard label="AÇÕES TOTAIS" value={String(overall.actionCount)} sub={`${overall.actionDone} concluídas`} hint="→ Ver todas as ações" onClick={() => setShowAllActions(true)} />
-          <div className="bg-okr-dk rounded-lg p-[18px_20px] shadow-card">
+          <MetricCard label="OBJETIVOS" value="2" sub="Confiabilidade · Experiência" hint="Ver objetivos" onClick={() => setShowObjetivos(true)} />
+          <MetricCard label="RESULTADOS-CHAVE" value="4" sub="Horas · Retificações · CES · NPS" hint="Ver resultados-chave" onClick={() => setShowKrList(true)} />
+          <MetricCard label="AÇÕES TOTAIS" value={String(overall.actionCount)} sub={`${overall.actionDone} concluídas`} hint="Ver todas as ações" onClick={() => setShowAllActions(true)} bordered />
+          <div className="bg-okr-dk rounded-xl p-[18px_20px] shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] hover:shadow-[0_4px_16px_rgba(13,38,1,0.12),0_8px_32px_rgba(13,38,1,0.08)] hover:-translate-y-0.5 transition-all duration-300 cursor-default">
             <div className="text-[11px] font-medium text-[#5fa867] uppercase tracking-wider mb-1.5">PROGRESSO GERAL</div>
             <div className="text-[28px] font-semibold text-[#a8e89c] leading-none">{overall.percent}%</div>
             <div className="text-xs text-[#6b9b73] mt-1">{overall.actionDone} de {overall.actionCount} ações concluídas</div>
@@ -104,7 +104,7 @@ const Dashboard: React.FC = () => {
               <button
                 key={kr.key}
                 onClick={() => setActiveKr(kr.key)}
-                className="bg-okr-su border border-okr-bl rounded-xl p-5 shadow-card text-left hover:border-okr-fo hover:-translate-y-px transition-all"
+                className="bg-okr-su border border-okr-bl rounded-xl p-5 shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] text-left hover:shadow-[0_4px_16px_rgba(13,38,1,0.12),0_8px_32px_rgba(13,38,1,0.08)] hover:-translate-y-0.5 transition-all duration-300"
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="bg-okr-dk text-[#a8e89c] text-[10px] font-medium px-2.5 py-0.5 rounded-full">{kr.name}</span>
@@ -112,7 +112,7 @@ const Dashboard: React.FC = () => {
                 </div>
                 <p className="text-[13px] font-medium text-okr-dk mb-1">{kr.fullName}</p>
                 <p className="text-[11px] text-okr-mi mb-2">Objetivo {kr.objetivo} · Meta: {kr.meta}</p>
-                <ProgressBar percent={p.percent} fillColor={kr.fillColor} height={8} />
+                <ProgressBar percent={p.percent} fillColor="#005216" height={8} />
                 <p className="text-[11px] text-okr-lt mt-2">{p.actionDone} de {p.actionCount} ações concluídas</p>
                 <p className="text-[10px] text-okr-fo mt-1 flex items-center gap-1">→ Ver ações vinculadas</p>
               </button>
@@ -121,7 +121,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Area Progress */}
-        <SectionLabel>Progresso por área — clique para gerenciar ações</SectionLabel>
+        <SectionLabel>Visão por área — clique para ver e editar as ações</SectionLabel>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
           {AREAS.filter(a => a.key !== 'todos').map(area => {
             const p = calcProgressByArea(area.key, actionStates, chipStates);
@@ -129,16 +129,16 @@ const Dashboard: React.FC = () => {
               <button
                 key={area.key}
                 onClick={() => setActiveArea(area.key)}
-                className="bg-okr-su border border-okr-bl rounded-lg p-4 shadow-card text-left hover:border-okr-fo hover:-translate-y-px transition-all"
+                className="bg-okr-su border border-okr-bl rounded-xl p-4 shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] text-left hover:shadow-[0_4px_16px_rgba(13,38,1,0.12),0_8px_32px_rgba(13,38,1,0.08)] hover:-translate-y-0.5 transition-all duration-300"
               >
                 <div className="flex items-center gap-2 mb-2">
                   <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: area.color }} />
                   <span className="text-sm font-medium text-okr-dk">{area.name}</span>
                 </div>
-                <div className="text-lg text-okr-dk mb-1">{p.percent}%</div>
+                <div className="text-lg font-semibold text-okr-dk mb-1">{p.percent}%</div>
                 <p className="text-[11px] text-okr-lt mb-2">{p.actionDone} de {p.actionCount} ações concluídas</p>
                 <ProgressBar percent={p.percent} fillColor={area.color} height={5} />
-                <p className="text-[10px] text-okr-fo mt-2">→ Gerenciar ações</p>
+                <p className="text-[10px] text-okr-fo mt-2">Ver ações →</p>
               </button>
             );
           })}
@@ -156,7 +156,7 @@ const Dashboard: React.FC = () => {
             { name: 'Maio', bg: '#005216', items: CRONOGRAMA.maio },
             { name: 'Junho', bg: '#36523D', items: CRONOGRAMA.junho },
           ].map(month => (
-            <div key={month.name} className="rounded-xl p-5" style={{ backgroundColor: month.bg }}>
+            <div key={month.name} className="rounded-xl p-5 shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)]" style={{ backgroundColor: month.bg }}>
               <h3 className="text-[13px] font-semibold text-[#a8e89c] mb-3">{month.name}</h3>
               <ul className="space-y-1.5">
                 {month.items.map((item, i) => (
@@ -172,7 +172,7 @@ const Dashboard: React.FC = () => {
 
         {/* Glossário */}
         <SectionLabel>Glossário</SectionLabel>
-        <div className="bg-okr-su border border-okr-bl rounded-lg shadow-card overflow-hidden mb-8">
+        <div className="bg-okr-su border border-okr-bl rounded-xl shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] overflow-hidden mb-8">
           <table className="w-full">
             <tbody>
               {GLOSSARIO.map((g, i) => (
@@ -187,7 +187,7 @@ const Dashboard: React.FC = () => {
 
         {/* Footer */}
         <div className="border-t border-okr-bl pt-4 text-center text-xs text-okr-lt">
-          OKRs — Time Igrejas · 2T 2026 · Abril–Junho · atualizado via Supabase em tempo real
+          OKRs — Time Igrejas · 2T 2026 · Abril–Junho
         </div>
       </div>
 
@@ -208,17 +208,17 @@ const MetricCard: React.FC<{
   sub: string;
   hint: string;
   onClick: () => void;
-}> = ({ label, value, sub, hint, onClick }) => (
+  bordered?: boolean;
+}> = ({ label, value, sub, hint, onClick, bordered }) => (
   <button
     onClick={onClick}
-    className="bg-okr-su border border-okr-bl rounded-lg p-[18px_20px] shadow-card text-left hover:border-okr-fo hover:-translate-y-px transition-all cursor-pointer"
+    className={`bg-okr-su rounded-xl p-[18px_20px] shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] text-left hover:shadow-[0_4px_16px_rgba(13,38,1,0.12),0_8px_32px_rgba(13,38,1,0.08)] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer ${bordered ? 'border-2 border-okr-fo' : 'border border-okr-bl'}`}
   >
     <div className="text-[11px] font-medium text-okr-lt uppercase tracking-wider mb-1.5">{label}</div>
     <div className="text-[28px] font-semibold text-okr-dk leading-none">{value}</div>
     <div className="text-xs text-okr-mi mt-1">{sub}</div>
     <div className="text-[10px] text-okr-lt mt-1.5 flex items-center gap-1">
-      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3 1L7 5L3 9" stroke="currentColor" strokeWidth="1.5" /></svg>
-      {hint.replace('→ ', '')}
+      → {hint}
     </div>
   </button>
 );
