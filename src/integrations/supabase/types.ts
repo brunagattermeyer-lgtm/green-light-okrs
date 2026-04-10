@@ -38,6 +38,30 @@ export type Database = {
         }
         Relationships: []
       }
+      activity_log: {
+        Row: {
+          action_text: string
+          action_type: string
+          created_at: string
+          id: string
+          user_email: string
+        }
+        Insert: {
+          action_text: string
+          action_type: string
+          created_at?: string
+          id?: string
+          user_email: string
+        }
+        Update: {
+          action_text?: string
+          action_type?: string
+          created_at?: string
+          id?: string
+          user_email?: string
+        }
+        Relationships: []
+      }
       chip_states: {
         Row: {
           chip_key: string
