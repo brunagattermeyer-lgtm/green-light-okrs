@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import logoAtlc from '@/assets/logo-atlc-trimmed.png';
+import logoAtlc from '@/assets/logo-atlc-cropped.png';
 
 const LoginPage: React.FC = () => {
   const { signIn, signUp } = useAuth();

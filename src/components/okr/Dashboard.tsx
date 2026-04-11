@@ -12,7 +12,7 @@ import AllActionsModal from '@/components/okr/AllActionsModal';
 import OkrCharts from '@/components/okr/OkrCharts';
 import DeadlineAlerts from '@/components/okr/DeadlineAlerts';
 import ActivityLogSidebar from '@/components/okr/ActivityLogSidebar';
-import logoAtlc from '@/assets/logo-atlc-trimmed.png';
+import logoAtlc from '@/assets/logo-atlc-cropped.png';
 
 const Dashboard: React.FC = () => {
   const { actionStates, chipStates, loading } = useOkrState();
