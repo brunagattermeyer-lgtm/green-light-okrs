@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import logoAtlc from '@/assets/logo-atlc.png';
 
 const LoginPage: React.FC = () => {
   const { signIn, signUp } = useAuth();
@@ -32,9 +33,7 @@ const LoginPage: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-okr-bg">
       <div className="bg-okr-su rounded-xl shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] p-8 w-full max-w-sm border border-okr-bl">
         <div className="mb-6 text-center">
-          <span className="inline-block bg-okr-dk text-[#a8d8a8] text-xs font-medium tracking-wider px-3 py-1 rounded-full mb-3">
-            Time Igrejas
-          </span>
+          <img src={logoAtlc} alt="ATLC Igrejas" className="h-16 mx-auto mb-3" />
           <h1 className="text-xl font-semibold text-okr-dk">Painel do Time</h1>
           <p className="text-sm text-okr-mi mt-1">{isSignUp ? 'Criar conta' : 'Entrar'}</p>
         </div>
