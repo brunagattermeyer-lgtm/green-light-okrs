@@ -84,7 +84,7 @@ const Dashboard: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
           <MetricCard label="OBJETIVOS" value="2" sub="Confiabilidade · Experiência" hint="Ver objetivos" onClick={() => setShowObjetivos(true)} />
           <MetricCard label="RESULTADOS-CHAVE" value="4" sub="Horas · Retificações · CES · NPS" hint="Ver resultados-chave" onClick={() => setShowKrList(true)} />
-          <MetricCard label="AÇÕES TOTAIS" value={String(overall.actionCount)} sub={`${overall.actionDone} concluídas`} hint="Ver todas as ações" onClick={() => setShowAllActions(true)} bordered />
+          <MetricCard label="AÇÕES TOTAIS" value={String(overall.actionCount)} sub={`${overall.actionDone} concluídas`} hint="Ver todas as ações" onClick={() => setShowAllActions(true)} />
           <div className="bg-okr-dk rounded-xl p-[18px_20px] shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] hover:shadow-[0_4px_16px_rgba(13,38,1,0.12),0_8px_32px_rgba(13,38,1,0.08)] hover:-translate-y-0.5 transition-all duration-300 cursor-default">
             <div className="text-[11px] font-medium text-[#5fa867] uppercase tracking-wider mb-1.5">PROGRESSO GERAL</div>
             <div className="text-[28px] font-semibold text-[#a8e89c] leading-none">{overall.percent}%</div>
@@ -104,7 +104,7 @@ const Dashboard: React.FC = () => {
               <button
                 key={kr.key}
                 onClick={() => setActiveKr(kr.key)}
-                className="bg-okr-su border border-okr-bl rounded-xl p-5 shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] text-left hover:shadow-[0_4px_16px_rgba(13,38,1,0.12),0_8px_32px_rgba(13,38,1,0.08)] hover:-translate-y-0.5 transition-all duration-300"
+                className="bg-okr-su rounded-xl p-5 shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] text-left hover:shadow-[0_4px_16px_rgba(13,38,1,0.12),0_8px_32px_rgba(13,38,1,0.08)] hover:-translate-y-0.5 hover:border-okr-bo border border-transparent transition-all duration-300"
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="bg-okr-dk text-[#a8e89c] text-[10px] font-medium px-2.5 py-0.5 rounded-full">{kr.name}</span>
@@ -129,7 +129,7 @@ const Dashboard: React.FC = () => {
               <button
                 key={area.key}
                 onClick={() => setActiveArea(area.key)}
-                className="bg-okr-su border border-okr-bl rounded-xl p-4 shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] text-left hover:shadow-[0_4px_16px_rgba(13,38,1,0.12),0_8px_32px_rgba(13,38,1,0.08)] hover:-translate-y-0.5 transition-all duration-300"
+                className="bg-okr-su rounded-xl p-4 shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] text-left hover:shadow-[0_4px_16px_rgba(13,38,1,0.12),0_8px_32px_rgba(13,38,1,0.08)] hover:-translate-y-0.5 hover:border-okr-bo border border-transparent transition-all duration-300"
               >
                 <div className="flex items-center gap-2 mb-2">
                   <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: area.color }} />
@@ -145,7 +145,6 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Charts */}
-        <SectionLabel>Gráficos</SectionLabel>
         <OkrCharts />
 
         {/* Cronograma */}
@@ -172,7 +171,7 @@ const Dashboard: React.FC = () => {
 
         {/* Glossário */}
         <SectionLabel>Glossário</SectionLabel>
-        <div className="bg-okr-su border border-okr-bl rounded-xl shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] overflow-hidden mb-8">
+        <div className="bg-okr-su rounded-xl shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] overflow-hidden mb-8 border border-transparent">
           <table className="w-full">
             <tbody>
               {GLOSSARIO.map((g, i) => (
@@ -208,11 +207,10 @@ const MetricCard: React.FC<{
   sub: string;
   hint: string;
   onClick: () => void;
-  bordered?: boolean;
-}> = ({ label, value, sub, hint, onClick, bordered }) => (
+}> = ({ label, value, sub, hint, onClick }) => (
   <button
     onClick={onClick}
-    className={`bg-okr-su rounded-xl p-[18px_20px] shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] text-left hover:shadow-[0_4px_16px_rgba(13,38,1,0.12),0_8px_32px_rgba(13,38,1,0.08)] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer ${bordered ? 'border-2 border-okr-fo' : 'border border-okr-bl'}`}
+    className="bg-okr-su rounded-xl p-[18px_20px] shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] text-left hover:shadow-[0_4px_16px_rgba(13,38,1,0.12),0_8px_32px_rgba(13,38,1,0.08)] hover:-translate-y-0.5 hover:border-okr-bo border border-transparent transition-all duration-300 cursor-pointer"
   >
     <div className="text-[11px] font-medium text-okr-lt uppercase tracking-wider mb-1.5">{label}</div>
     <div className="text-[28px] font-semibold text-okr-dk leading-none">{value}</div>
