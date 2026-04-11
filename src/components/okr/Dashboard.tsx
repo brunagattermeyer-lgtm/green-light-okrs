@@ -155,7 +155,7 @@ const Dashboard: React.FC = () => {
             { name: 'Maio', bg: '#005216', items: CRONOGRAMA.maio },
             { name: 'Junho', bg: '#36523D', items: CRONOGRAMA.junho },
           ].map(month => (
-            <div key={month.name} className="rounded-xl p-5 shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)]" style={{ backgroundColor: month.bg }}>
+            <div key={month.name} className="rounded-xl p-5 shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] hover:shadow-[0_4px_16px_rgba(13,38,1,0.12),0_8px_32px_rgba(13,38,1,0.08)] hover:-translate-y-0.5 transition-all duration-300" style={{ backgroundColor: month.bg }}>
               <h3 className="text-[13px] font-semibold text-[#a8e89c] mb-3">{month.name}</h3>
               <ul className="space-y-1.5">
                 {month.items.map((item, i) => (
