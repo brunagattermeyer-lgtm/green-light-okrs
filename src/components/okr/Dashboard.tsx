@@ -12,6 +12,7 @@ import AllActionsModal from '@/components/okr/AllActionsModal';
 import OkrCharts from '@/components/okr/OkrCharts';
 import DeadlineAlerts from '@/components/okr/DeadlineAlerts';
 import ActivityLogSidebar from '@/components/okr/ActivityLogSidebar';
+import logoAtlc from '@/assets/logo-atlc.png';
 
 const Dashboard: React.FC = () => {
   const { actionStates, chipStates, loading } = useOkrState();
@@ -71,9 +72,10 @@ const Dashboard: React.FC = () => {
 
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-2.5 mb-2">
+          <div className="flex items-center gap-3 mb-2">
+            <img src={logoAtlc} alt="ATLC Igrejas" className="h-10" />
             <span className="bg-okr-dk text-[#a8d8a8] text-[11px] font-medium tracking-wider px-3 py-1 rounded-full">
-              Time Igrejas · 2T 2026
+              2T 2026
             </span>
           </div>
           <h1 className="text-[26px] font-semibold text-okr-dk tracking-tight">OKRs — Gestão Operacional</h1>

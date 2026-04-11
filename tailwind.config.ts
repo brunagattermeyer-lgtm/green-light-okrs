@@ -51,13 +51,13 @@ export default {
         },
         okr: {
           dk: "#0D2601",
-          fo: "#005216",
+          fo: "#00742E",
           mi: "#36523D",
-          br: "#00D141",
+          br: "#00B140",
           bg: "#f4f7f4",
           su: "#ffffff",
-          bo: "#d0ddd0",
-          bl: "#e8f0e8",
+          bo: "#c8dcc8",
+          bl: "#e4efe4",
           lt: "#5a7a62",
         },
         sidebar: {
