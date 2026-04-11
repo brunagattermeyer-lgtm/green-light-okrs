@@ -163,14 +163,14 @@ export const ACTIONS: OkrAction[] = [
 ];
 
 export const GLOSSARIO = [
-  { termo: 'OKR', def: 'Objectives and Key Results — metodologia de metas' },
-  { termo: 'KR', def: 'Key Result — resultado mensurável que indica progresso' },
-  { termo: 'CES', def: 'Customer Effort Score — facilidade do atendimento (meta ≥ 4,0)' },
-  { termo: 'NPS', def: 'Net Promoter Score — lealdade e satisfação dos clientes (meta ≥ 75)' },
+  { termo: 'OKR', def: 'Objectives and Key Results — metodologia de definição e acompanhamento de metas estratégicas' },
+  { termo: 'KR', def: 'Key Result — resultado-chave mensurável vinculado a um objetivo' },
+  { termo: 'CES', def: 'Customer Effort Score — índice que mede o esforço percebido pelo cliente no atendimento' },
+  { termo: 'NPS', def: 'Net Promoter Score — índice de lealdade e satisfação dos clientes com a empresa' },
   { termo: 'FOPAG', def: 'Folha de Pagamento' },
   { termo: 'CCT', def: 'Convenção Coletiva de Trabalho' },
-  { termo: 'PLICK', def: 'Sistema de automação contábil recorrente' },
-  { termo: 'Horas/rotina', def: 'Indicador de eficiência operacional por hora dedicada a rotinas' },
+  { termo: 'PLICK', def: 'Plataforma que faz a conversão e tratamento de documentos do cliente para importação pela contabilidade' },
+  { termo: 'CRM', def: 'Customer Relationship Management — sistema de gestão de relacionamento com clientes' },
 ];
 
 export const CRONOGRAMA = {
