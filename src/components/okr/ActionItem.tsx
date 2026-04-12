@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { OkrAction, AREAS, KRS } from '@/data/okrData';
 import { useOkrState } from '@/contexts/OkrStateContext';
 
@@ -23,7 +23,6 @@ const ActionItem: React.FC<ActionItemProps> = ({ action, editable = false, areaC
   const area = AREAS.find(a => a.key === action.area);
   const kr = KRS.find(k => k.key === action.kr);
 
-  // Close tooltip on outside click
   useEffect(() => {
     if (!showTooltip) return;
     const handler = (e: MouseEvent) => {
@@ -34,6 +33,32 @@ const ActionItem: React.FC<ActionItemProps> = ({ action, editable = false, areaC
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [showTooltip]);
+
+  const getTooltipPosition = useCallback(() => {
+    if (!btnRef.current) return { top: 0, left: 0 };
+    const rect = btnRef.current.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceRight = window.innerWidth - rect.right;
+    
+    let top: number;
+    let left: number;
+
+    // Position vertically: below or above
+    if (spaceBelow < 250) {
+      top = rect.top - 8; // show above, will use transform
+    } else {
+      top = rect.bottom + 8;
+    }
+
+    // Position horizontally
+    if (spaceRight < 340) {
+      left = rect.left - 320;
+    } else {
+      left = rect.right + 8;
+    }
+
+    return { top, left, showAbove: spaceBelow < 250 };
+  }, []);
 
   return (
     <div className={`flex flex-col gap-1.5 p-3 rounded-lg transition-colors ${action.sub ? 'ml-5 bg-[#fafcfa] border-l-[3px] border-okr-bo' : ''}`}>
@@ -73,42 +98,45 @@ const ActionItem: React.FC<ActionItemProps> = ({ action, editable = false, areaC
               >
                 i
               </button>
-              {showTooltip && (
-                <div
-                  ref={tooltipRef}
-                  className="fixed z-[9999] w-[320px] bg-okr-dk text-[#c8eebc] text-xs p-3 rounded-lg shadow-modal"
-                  style={{
-                    top: btnRef.current ? btnRef.current.getBoundingClientRect().top : 0,
-                    left: btnRef.current ? btnRef.current.getBoundingClientRect().right + 8 : 0,
-                  }}
-                >
-                  <p><strong>Responsável:</strong> {action.resp}</p>
-                  <p><strong>Prazo:</strong> {action.prazo}</p>
-                  <p><strong>Área:</strong> {area?.name}</p>
-                  <p><strong>KR:</strong> {kr?.fullName || kr?.name}</p>
-                  {action.sub && <p className="mt-1 text-[10px] opacity-75">Subtask — contribui para o progresso da ação principal</p>}
-                  {action.recurrent && <p className="mt-1 text-[10px] opacity-75">Ação recorrente — progresso por chips</p>}
-                  {action.direcionamento && (
-                    <div className="mt-2 pt-2 border-t border-[#2a4a1a]">
-                      <p className="text-[10px] uppercase tracking-wider text-[#7dcc6d] font-semibold mb-1">Direcionamento Operacional</p>
-                      <p className="text-[11px] leading-relaxed">{action.direcionamento}</p>
-                    </div>
-                  )}
-                  {action.expectativas && action.expectativas.length > 0 && (
-                    <div className="mt-2 pt-2 border-t border-[#2a4a1a]">
-                      <p className="text-[10px] uppercase tracking-wider text-[#7dcc6d] font-semibold mb-1">Expectativas / Critérios</p>
-                      <ul className="space-y-0.5">
-                        {action.expectativas.map((e, i) => (
-                          <li key={i} className="text-[11px] leading-relaxed flex items-start gap-1.5">
-                            <span className="text-[#7dcc6d] mt-0.5">·</span>
-                            <span>{e}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              )}
+              {showTooltip && (() => {
+                const pos = getTooltipPosition();
+                return (
+                  <div
+                    ref={tooltipRef}
+                    className="fixed z-[9999] w-[320px] bg-okr-dk text-[#c8eebc] text-xs p-3 rounded-lg shadow-modal"
+                    style={{
+                      top: pos.showAbove ? undefined : pos.top,
+                      bottom: pos.showAbove ? (window.innerHeight - (btnRef.current?.getBoundingClientRect().top ?? 0) + 8) : undefined,
+                      left: Math.max(8, pos.left),
+                    }}
+                  >
+                    <p><strong>Prazo:</strong> {action.prazo}</p>
+                    <p><strong>Area:</strong> {area?.name}</p>
+                    <p><strong>KR:</strong> {kr?.fullName || kr?.name}</p>
+                    {action.sub && <p className="mt-1 text-[10px] opacity-75">Subtask — contribui para o progresso da acao principal</p>}
+                    {action.recurrent && <p className="mt-1 text-[10px] opacity-75">Acao recorrente — progresso por chips</p>}
+                    {action.direcionamento && (
+                      <div className="mt-2 pt-2 border-t border-[#2a4a1a]">
+                        <p className="text-[10px] uppercase tracking-wider text-[#7dcc6d] font-semibold mb-1">Direcionamento Operacional</p>
+                        <p className="text-[11px] leading-relaxed">{action.direcionamento}</p>
+                      </div>
+                    )}
+                    {action.expectativas && action.expectativas.length > 0 && (
+                      <div className="mt-2 pt-2 border-t border-[#2a4a1a]">
+                        <p className="text-[10px] uppercase tracking-wider text-[#7dcc6d] font-semibold mb-1">Expectativas / Criterios</p>
+                        <ul className="space-y-0.5">
+                          {action.expectativas.map((e, i) => (
+                            <li key={i} className="text-[11px] leading-relaxed flex items-start gap-1.5">
+                              <span className="text-[#7dcc6d] mt-0.5">·</span>
+                              <span>{e}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           </div>
 

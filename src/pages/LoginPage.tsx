@@ -6,6 +6,7 @@ const LoginPage: React.FC = () => {
   const { signIn, signUp } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -51,14 +52,28 @@ const LoginPage: React.FC = () => {
           </div>
           <div>
             <label className="block text-xs font-medium text-okr-lt uppercase tracking-wider mb-1">Senha</label>
-            <input
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              required
-              minLength={6}
-              className="w-full px-3 py-2 rounded-lg border border-okr-bl bg-okr-su text-okr-dk text-sm focus:outline-none focus:ring-2 focus:ring-okr-fo"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                required
+                minLength={6}
+                className="w-full px-3 py-2 pr-10 rounded-lg border border-okr-bl bg-okr-su text-okr-dk text-sm focus:outline-none focus:ring-2 focus:ring-okr-fo"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-okr-lt hover:text-okr-mi transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/><circle cx="8" cy="8" r="2" stroke="currentColor" strokeWidth="1.3"/><path d="M3 13L13 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/><circle cx="8" cy="8" r="2" stroke="currentColor" strokeWidth="1.3"/></svg>
+                )}
+              </button>
+            </div>
           </div>
 
           {error && <p className="text-red-600 text-xs">{error}</p>}
@@ -77,7 +92,7 @@ const LoginPage: React.FC = () => {
           onClick={() => { setIsSignUp(!isSignUp); setError(''); setSuccess(''); }}
           className="mt-4 w-full text-center text-xs text-okr-lt hover:text-okr-fo transition-colors"
         >
-          {isSignUp ? 'Já tem conta? Entrar' : 'Não tem conta? Criar'}
+          {isSignUp ? 'Ja tem conta? Entrar' : 'Nao tem conta? Criar'}
         </button>
       </div>
     </div>

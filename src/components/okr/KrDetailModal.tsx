@@ -19,7 +19,6 @@ const KrDetailModal: React.FC<KrDetailModalProps> = ({ krKey, open, onClose }) =
   const p = calcProgressByKr(krKey, actionStates, chipStates);
   const actions = ACTIONS.filter(a => a.kr === krKey);
 
-  // Group by area
   const areaGroups: Record<string, typeof actions> = {};
   actions.forEach(a => {
     if (!areaGroups[a.area]) areaGroups[a.area] = [];
@@ -31,7 +30,7 @@ const KrDetailModal: React.FC<KrDetailModalProps> = ({ krKey, open, onClose }) =
       <div className="mb-4">
         <div className="flex items-center gap-3 mb-2">
           <span className="text-2xl text-okr-dk">{p.percent}%</span>
-          <span className="text-sm text-okr-mi">{p.actionDone} de {p.actionCount} ações concluídas</span>
+          <span className="text-sm text-okr-mi">{p.actionDone} de {p.actionCount} acoes concluidas</span>
         </div>
         <ProgressBar percent={p.percent} fillColor={kr.fillColor} />
         <p className="text-[11px] text-okr-lt mt-2">Objetivo {kr.objetivo} · Meta: {kr.meta}</p>
@@ -50,9 +49,11 @@ const KrDetailModal: React.FC<KrDetailModalProps> = ({ krKey, open, onClose }) =
                 ? (action.chips?.every((_, i) => chipStates[`${action.id}_${i}`]) ?? false)
                 : !!actionStates[action.id];
               return (
-                <div key={action.id} className={`py-2 px-3 text-[13px] text-okr-dk ${action.sub ? 'ml-5 text-okr-mi' : ''} ${isDone ? 'line-through opacity-60' : ''}`}>
-                  {action.sub && '↳ '}{action.text}
-                  <span className="ml-2 text-[10px] text-okr-lt">({action.resp})</span>
+                <div key={action.id} className={`flex items-center justify-between py-2 px-3 ${action.sub ? 'ml-5' : ''} ${isDone ? 'opacity-60' : ''}`}>
+                  <span className={`text-[13px] text-okr-dk flex-1 ${isDone ? 'line-through' : ''}`}>
+                    {action.sub && '↳ '}{action.text}
+                  </span>
+                  <span className="text-[10px] text-okr-lt ml-2 flex-shrink-0">{action.prazo}</span>
                 </div>
               );
             })}
