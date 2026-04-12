@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ACTIONS, AREAS, KRS, OBJETIVOS, GLOSSARIO, CRONOGRAMA, KrKey, AreaKey } from '@/data/okrData';
 import { useOkrState } from '@/contexts/OkrStateContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { calcOverallProgress, calcProgressByKr, calcProgressByArea } from '@/lib/progressCalc';
+import { supabase } from '@/integrations/supabase/client';
 import ProgressBar from '@/components/okr/ProgressBar';
 import AreaModal from '@/components/okr/AreaModal';
 import ObjetivosModal from '@/components/okr/ObjetivosModal';
@@ -12,10 +13,12 @@ import AllActionsModal from '@/components/okr/AllActionsModal';
 import OkrCharts from '@/components/okr/OkrCharts';
 import DeadlineAlerts from '@/components/okr/DeadlineAlerts';
 import ActivityLogSidebar from '@/components/okr/ActivityLogSidebar';
+import ActionFormModal from '@/components/okr/ActionFormModal';
+import SpreadsheetImportModal from '@/components/okr/SpreadsheetImportModal';
 import logoAtlc from '@/assets/logo-atlc-cropped.png';
 
 const QUARTERS = [
-  { label: '1Q2026', period: 'Janeiro — Março 2026' },
+  { label: '1Q2026', period: 'Janeiro — Marco 2026' },
   { label: '2Q2026', period: 'Abril — Junho 2026' },
   { label: '3Q2026', period: 'Julho — Setembro 2026' },
   { label: '4Q2026', period: 'Outubro — Dezembro 2026' },
@@ -31,8 +34,22 @@ const Dashboard: React.FC = () => {
   const [activeKr, setActiveKr] = useState<KrKey | null>(null);
   const [showLog, setShowLog] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-  const [selectedQuarter, setSelectedQuarter] = useState(1); // index into QUARTERS, 1 = 2Q2026
+  const [selectedQuarter, setSelectedQuarter] = useState(1);
   const [showQuarterDropdown, setShowQuarterDropdown] = useState(false);
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'charts'>('dashboard');
+  const [showCreateAction, setShowCreateAction] = useState(false);
+  const [showSpreadsheets, setShowSpreadsheets] = useState(false);
+  const [spreadsheetImports, setSpreadsheetImports] = useState<any[]>([]);
+
+  useEffect(() => {
+    supabase.from('spreadsheet_imports').select('*').order('created_at', { ascending: false })
+      .then(({ data }) => setSpreadsheetImports(data || []));
+  }, []);
+
+  const refreshSpreadsheets = () => {
+    supabase.from('spreadsheet_imports').select('*').order('created_at', { ascending: false })
+      .then(({ data }) => setSpreadsheetImports(data || []));
+  };
 
   if (loading) {
     return (
@@ -67,12 +84,24 @@ const Dashboard: React.FC = () => {
             {showMenu && (
               <>
                 <div className="fixed inset-0 z-30" onClick={() => setShowMenu(false)} />
-                <div className="absolute right-0 top-full mt-1 bg-okr-su border border-okr-bl rounded-lg shadow-modal z-40 min-w-[160px]">
+                <div className="absolute right-0 top-full mt-1 bg-okr-su border border-okr-bl rounded-lg shadow-modal z-40 min-w-[180px]">
                   <button
                     onClick={() => { setShowLog(true); setShowMenu(false); }}
-                    className="w-full text-left px-4 py-2.5 text-xs text-okr-dk hover:bg-okr-bl transition-colors rounded-lg"
+                    className="w-full text-left px-4 py-2.5 text-xs text-okr-dk hover:bg-okr-bl transition-colors rounded-t-lg"
                   >
                     Mostrar log
+                  </button>
+                  <button
+                    onClick={() => { setShowSpreadsheets(true); setShowMenu(false); }}
+                    className="w-full text-left px-4 py-2.5 text-xs text-okr-dk hover:bg-okr-bl transition-colors"
+                  >
+                    Planilhas importadas
+                  </button>
+                  <button
+                    onClick={() => { setShowCreateAction(true); setShowMenu(false); }}
+                    className="w-full text-left px-4 py-2.5 text-xs text-okr-dk hover:bg-okr-bl transition-colors rounded-b-lg"
+                  >
+                    Nova acao
                   </button>
                 </div>
               </>
@@ -116,107 +145,132 @@ const Dashboard: React.FC = () => {
           <p className="text-sm text-okr-mi mt-1">{quarter.period} · 2 objetivos · 4 resultados-chave</p>
         </div>
 
-        {/* Metric cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
-          <MetricCard label="OBJETIVOS" value="2" sub="Confiabilidade · Experiencia" hint="Ver objetivos" onClick={() => setShowObjetivos(true)} />
-          <MetricCard label="RESULTADOS-CHAVE" value="4" sub="Horas · Retificacoes · CES · NPS" hint="Ver resultados-chave" onClick={() => setShowKrList(true)} />
-          <MetricCard label="ACOES TOTAIS" value={String(overall.actionCount)} sub={`${overall.actionDone} concluidas`} hint="Ver todas as acoes" onClick={() => setShowAllActions(true)} />
-          <div className="bg-okr-dk rounded-xl p-[18px_20px] shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] hover:shadow-[0_4px_16px_rgba(13,38,1,0.12),0_8px_32px_rgba(13,38,1,0.08)] hover:-translate-y-0.5 transition-all duration-300 cursor-default">
-            <div className="text-[11px] font-medium text-[#5fa867] uppercase tracking-wider mb-1.5">PROGRESSO GERAL</div>
-            <div className="text-[28px] font-semibold text-[#a8e89c] leading-none">{overall.percent}%</div>
-            <div className="text-xs text-[#6b9b73] mt-1">{overall.actionDone} de {overall.actionCount} acoes concluidas</div>
-          </div>
+        {/* Dashboard / Charts tabs */}
+        <div className="flex gap-1 mb-6 bg-okr-bl rounded-lg p-0.5 w-fit">
+          <button
+            onClick={() => setActiveTab('dashboard')}
+            className={`px-4 py-1.5 rounded-md text-xs font-medium transition-colors ${
+              activeTab === 'dashboard' ? 'bg-okr-su text-okr-dk shadow-sm' : 'text-okr-mi hover:text-okr-dk'
+            }`}
+          >
+            Dashboard
+          </button>
+          <button
+            onClick={() => setActiveTab('charts')}
+            className={`px-4 py-1.5 rounded-md text-xs font-medium transition-colors ${
+              activeTab === 'charts' ? 'bg-okr-su text-okr-dk shadow-sm' : 'text-okr-mi hover:text-okr-dk'
+            }`}
+          >
+            Graficos
+          </button>
         </div>
 
-        {/* Deadline Alerts */}
-        <DeadlineAlerts onOpenArea={setActiveArea} />
-
-        {/* KR Progress */}
-        <SectionLabel>Progresso por resultado-chave</SectionLabel>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 mb-8">
-          {KRS.map(kr => {
-            const p = calcProgressByKr(kr.key, actionStates, chipStates);
-            return (
-              <button
-                key={kr.key}
-                onClick={() => setActiveKr(kr.key)}
-                className="bg-okr-su rounded-xl p-5 shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] text-left hover:shadow-[0_4px_16px_rgba(13,38,1,0.12),0_8px_32px_rgba(13,38,1,0.08)] hover:-translate-y-0.5 hover:border-okr-bo border border-transparent transition-all duration-300"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="bg-okr-dk text-[#a8e89c] text-[10px] font-medium px-2.5 py-0.5 rounded-full">{kr.name}</span>
-                  <span className="text-[22px] text-okr-dk">{p.percent}%</span>
-                </div>
-                <p className="text-[13px] font-medium text-okr-dk mb-1">{kr.fullName}</p>
-                <p className="text-[11px] text-okr-mi mb-2">Objetivo {kr.objetivo} · Meta: {kr.meta}</p>
-                <ProgressBar percent={p.percent} fillColor="#005216" height={8} />
-                <p className="text-[11px] text-okr-lt mt-2">{p.actionDone} de {p.actionCount} acoes concluidas</p>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Area Progress */}
-        <SectionLabel>Visao por area</SectionLabel>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
-          {AREAS.filter(a => a.key !== 'todos').map(area => {
-            const p = calcProgressByArea(area.key, actionStates, chipStates);
-            return (
-              <button
-                key={area.key}
-                onClick={() => setActiveArea(area.key)}
-                className="bg-okr-su rounded-xl p-4 shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] text-left hover:shadow-[0_4px_16px_rgba(13,38,1,0.12),0_8px_32px_rgba(13,38,1,0.08)] hover:-translate-y-0.5 hover:border-okr-bo border border-transparent transition-all duration-300"
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: area.color }} />
-                  <span className="text-sm font-medium text-okr-dk">{area.name}</span>
-                </div>
-                <div className="text-lg font-semibold text-okr-dk mb-1">{p.percent}%</div>
-                <p className="text-[11px] text-okr-lt mb-2">{p.actionDone} de {p.actionCount} acoes concluidas</p>
-                <ProgressBar percent={p.percent} fillColor={area.color} height={5} />
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Charts */}
-        <OkrCharts />
-
-        {/* Cronograma */}
-        <SectionLabel>Cronograma trimestral</SectionLabel>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
-          {[
-            { name: 'Abril', bg: '#0D2601', items: CRONOGRAMA.abril },
-            { name: 'Maio', bg: '#005216', items: CRONOGRAMA.maio },
-            { name: 'Junho', bg: '#36523D', items: CRONOGRAMA.junho },
-          ].map(month => (
-            <div key={month.name} className="rounded-xl p-5 shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] hover:shadow-[0_4px_16px_rgba(13,38,1,0.12),0_8px_32px_rgba(13,38,1,0.08)] hover:-translate-y-0.5 transition-all duration-300" style={{ backgroundColor: month.bg }}>
-              <h3 className="text-[13px] font-semibold text-[#a8e89c] mb-3">{month.name}</h3>
-              <ul className="space-y-1.5">
-                {month.items.map((item, i) => (
-                  <li key={i} className="text-[12px] text-[#c0e8b8] flex items-start gap-2">
-                    <span className="text-okr-br mt-0.5">·</span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
+        {activeTab === 'dashboard' && (
+          <>
+            {/* Metric cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+              <MetricCard label="OBJETIVOS" value="2" sub="Confiabilidade · Experiencia" hint="Ver objetivos" onClick={() => setShowObjetivos(true)} />
+              <MetricCard label="RESULTADOS-CHAVE" value="4" sub="Horas · Retificacoes · CES · NPS" hint="Ver resultados-chave" onClick={() => setShowKrList(true)} />
+              <MetricCard label="ACOES TOTAIS" value={String(overall.actionCount)} sub={`${overall.actionDone} concluidas`} hint="Ver todas as acoes" onClick={() => setShowAllActions(true)} />
+              <div className="bg-okr-dk rounded-xl p-[18px_20px] shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] hover:shadow-[0_4px_16px_rgba(13,38,1,0.12),0_8px_32px_rgba(13,38,1,0.08)] hover:-translate-y-0.5 transition-all duration-300 cursor-default">
+                <div className="text-[11px] font-medium text-[#5fa867] uppercase tracking-wider mb-1.5">PROGRESSO GERAL</div>
+                <div className="text-[28px] font-semibold text-[#a8e89c] leading-none">{overall.percent}%</div>
+                <div className="text-xs text-[#6b9b73] mt-1">{overall.actionDone} de {overall.actionCount} acoes concluidas</div>
+              </div>
             </div>
-          ))}
-        </div>
 
-        {/* Glossario */}
-        <SectionLabel>Glossario</SectionLabel>
-        <div className="bg-okr-su rounded-xl shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] overflow-hidden mb-8 border border-transparent">
-          <table className="w-full">
-            <tbody>
-              {GLOSSARIO.map((g, i) => (
-                <tr key={g.termo} className={i > 0 ? 'border-t border-okr-bl' : ''}>
-                  <td className="px-4 py-3 text-xs font-bold text-okr-dk w-32 align-top">{g.termo}</td>
-                  <td className="px-4 py-3 text-[13px] text-okr-mi">{g.def}</td>
-                </tr>
+            {/* Deadline Alerts */}
+            <DeadlineAlerts onOpenArea={setActiveArea} />
+
+            {/* KR Progress */}
+            <SectionLabel>Progresso por resultado-chave</SectionLabel>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 mb-8">
+              {KRS.map(kr => {
+                const p = calcProgressByKr(kr.key, actionStates, chipStates);
+                return (
+                  <button
+                    key={kr.key}
+                    onClick={() => setActiveKr(kr.key)}
+                    className="bg-okr-su rounded-xl p-5 shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] text-left hover:shadow-[0_4px_16px_rgba(13,38,1,0.12),0_8px_32px_rgba(13,38,1,0.08)] hover:-translate-y-0.5 hover:border-okr-bo border border-transparent transition-all duration-300"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="bg-okr-dk text-[#a8e89c] text-[10px] font-medium px-2.5 py-0.5 rounded-full">{kr.name}</span>
+                      <span className="text-[22px] text-okr-dk">{p.percent}%</span>
+                    </div>
+                    <p className="text-[13px] font-medium text-okr-dk mb-1">{kr.fullName}</p>
+                    <p className="text-[11px] text-okr-mi mb-2">Objetivo {kr.objetivo} · Meta: {kr.meta}</p>
+                    <ProgressBar percent={p.percent} fillColor="#005216" height={8} />
+                    <p className="text-[11px] text-okr-lt mt-2">{p.actionDone} de {p.actionCount} acoes concluidas</p>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Area Progress */}
+            <SectionLabel>Visao por area</SectionLabel>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+              {AREAS.filter(a => a.key !== 'todos').map(area => {
+                const p = calcProgressByArea(area.key, actionStates, chipStates);
+                return (
+                  <button
+                    key={area.key}
+                    onClick={() => setActiveArea(area.key)}
+                    className="bg-okr-su rounded-xl p-4 shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] text-left hover:shadow-[0_4px_16px_rgba(13,38,1,0.12),0_8px_32px_rgba(13,38,1,0.08)] hover:-translate-y-0.5 hover:border-okr-bo border border-transparent transition-all duration-300"
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: area.color }} />
+                      <span className="text-sm font-medium text-okr-dk">{area.name}</span>
+                    </div>
+                    <div className="text-lg font-semibold text-okr-dk mb-1">{p.percent}%</div>
+                    <p className="text-[11px] text-okr-lt mb-2">{p.actionDone} de {p.actionCount} acoes concluidas</p>
+                    <ProgressBar percent={p.percent} fillColor={area.color} height={5} />
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Cronograma */}
+            <SectionLabel>Cronograma trimestral</SectionLabel>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
+              {[
+                { name: 'Abril', bg: '#0D2601', items: CRONOGRAMA.abril },
+                { name: 'Maio', bg: '#005216', items: CRONOGRAMA.maio },
+                { name: 'Junho', bg: '#36523D', items: CRONOGRAMA.junho },
+              ].map(month => (
+                <div key={month.name} className="rounded-xl p-5 shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] hover:shadow-[0_4px_16px_rgba(13,38,1,0.12),0_8px_32px_rgba(13,38,1,0.08)] hover:-translate-y-0.5 transition-all duration-300" style={{ backgroundColor: month.bg }}>
+                  <h3 className="text-[13px] font-semibold text-[#a8e89c] mb-3">{month.name}</h3>
+                  <ul className="space-y-1.5">
+                    {month.items.map((item, i) => (
+                      <li key={i} className="text-[12px] text-[#c0e8b8] flex items-start gap-2">
+                        <span className="text-okr-br mt-0.5">·</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               ))}
-            </tbody>
-          </table>
-        </div>
+            </div>
+
+            {/* Glossario */}
+            <SectionLabel>Glossario</SectionLabel>
+            <div className="bg-okr-su rounded-xl shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] overflow-hidden mb-8 border border-transparent">
+              <table className="w-full">
+                <tbody>
+                  {GLOSSARIO.map((g, i) => (
+                    <tr key={g.termo} className={i > 0 ? 'border-t border-okr-bl' : ''}>
+                      <td className="px-4 py-3 text-xs font-bold text-okr-dk w-32 align-top">{g.termo}</td>
+                      <td className="px-4 py-3 text-[13px] text-okr-mi">{g.def}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+
+        {activeTab === 'charts' && (
+          <OkrCharts />
+        )}
 
         {/* Footer */}
         <div className="border-t border-okr-bl pt-4 text-center text-xs text-okr-lt">
@@ -231,6 +285,15 @@ const Dashboard: React.FC = () => {
       <KrDetailModal krKey={activeKr} open={!!activeKr} onClose={() => setActiveKr(null)} />
       <AllActionsModal open={showAllActions} onClose={() => setShowAllActions(false)} />
       <ActivityLogSidebar open={showLog} onClose={() => setShowLog(false)} />
+      {showCreateAction && <ActionFormModal open={showCreateAction} onClose={() => setShowCreateAction(false)} />}
+      {showSpreadsheets && (
+        <SpreadsheetImportModal
+          open={showSpreadsheets}
+          onClose={() => setShowSpreadsheets(false)}
+          imports={spreadsheetImports}
+          onRefresh={refreshSpreadsheets}
+        />
+      )}
     </div>
   );
 };
