@@ -86,6 +86,102 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_actions: {
+        Row: {
+          action_text: string
+          area: string
+          chip_label: string | null
+          chips: string[] | null
+          created_at: string
+          created_by: string | null
+          direcionamento: string | null
+          expectativas: string[] | null
+          follow_up_dates: string[] | null
+          id: string
+          is_action_plan: boolean
+          is_recurrent: boolean
+          is_subtask: boolean
+          kr: string
+          parent_action_id: string | null
+          prazo: string
+          responsaveis: string[]
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          action_text: string
+          area: string
+          chip_label?: string | null
+          chips?: string[] | null
+          created_at?: string
+          created_by?: string | null
+          direcionamento?: string | null
+          expectativas?: string[] | null
+          follow_up_dates?: string[] | null
+          id?: string
+          is_action_plan?: boolean
+          is_recurrent?: boolean
+          is_subtask?: boolean
+          kr: string
+          parent_action_id?: string | null
+          prazo: string
+          responsaveis?: string[]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          action_text?: string
+          area?: string
+          chip_label?: string | null
+          chips?: string[] | null
+          created_at?: string
+          created_by?: string | null
+          direcionamento?: string | null
+          expectativas?: string[] | null
+          follow_up_dates?: string[] | null
+          id?: string
+          is_action_plan?: boolean
+          is_recurrent?: boolean
+          is_subtask?: boolean
+          kr?: string
+          parent_action_id?: string | null
+          prazo?: string
+          responsaveis?: string[]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      spreadsheet_imports: {
+        Row: {
+          created_at: string
+          data_snapshot: Json | null
+          file_name: string
+          file_path: string
+          id: string
+          imported_by: string
+          imported_by_email: string
+        }
+        Insert: {
+          created_at?: string
+          data_snapshot?: Json | null
+          file_name: string
+          file_path: string
+          id?: string
+          imported_by: string
+          imported_by_email: string
+        }
+        Update: {
+          created_at?: string
+          data_snapshot?: Json | null
+          file_name?: string
+          file_path?: string
+          id?: string
+          imported_by?: string
+          imported_by_email?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
