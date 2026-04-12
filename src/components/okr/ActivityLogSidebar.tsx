@@ -53,10 +53,14 @@ const ActivityLogSidebar: React.FC<ActivityLogSidebarProps> = ({ open, onClose }
 
   const typeLabel = (type: string) => {
     switch (type) {
-      case 'action_done': return 'marcou como concluída';
+      case 'action_done': return 'marcou como concluida';
       case 'action_undone': return 'desmarcou';
-      case 'chip_done': return 'marcou presença em';
-      case 'chip_undone': return 'desmarcou presença em';
+      case 'chip_done': return 'marcou presenca em';
+      case 'chip_undone': return 'desmarcou presenca em';
+      case 'action_created': return 'criou a acao';
+      case 'action_edited': return 'editou a acao';
+      case 'spreadsheet_imported': return 'importou a planilha';
+      case 'spreadsheet_deleted': return 'excluiu a planilha';
       default: return type;
     }
   };
