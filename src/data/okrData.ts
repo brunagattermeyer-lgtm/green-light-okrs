@@ -16,7 +16,7 @@ export interface OkrAction {
   expectativas?: string[];
 }
 
-export type AreaKey = 'fiscal' | 'contabil' | 'gp' | 'gestao' | 'todos';
+export type AreaKey = 'fiscal' | 'contabil' | 'gp' | 'gestao' | 'geral' | 'todos';
 export type KrKey = 'horas' | 'retificacoes' | 'ces' | 'nps';
 
 export interface AreaInfo {
@@ -38,9 +38,20 @@ export const AREAS: AreaInfo[] = [
   { key: 'fiscal', name: 'Fiscal', color: '#005216' },
   { key: 'contabil', name: 'Contábil', color: '#36523D' },
   { key: 'gp', name: 'Gestão de Pessoas', color: '#00D141' },
-  { key: 'gestao', name: 'Gestão', color: '#0D2601' },
+  { key: 'gestao', name: 'Gestão Operacional', color: '#0D2601' },
+  { key: 'geral', name: 'Geral - Time', color: '#4a7c59' },
   { key: 'todos', name: 'Todos', color: '#4a7c59' },
 ];
+
+export const RESP_OPTIONS = ['Bruna', 'Camila', 'Shirley', 'Karina', 'Moisés', 'Geral (Time)'];
+
+export const RESP_AREA_MAP: Record<string, AreaKey> = {
+  'Karina': 'contabil',
+  'Shirley': 'contabil',
+  'Bruna': 'gestao',
+  'Camila': 'gp',
+  'Moisés': 'fiscal',
+};
 
 export const KRS: KrInfo[] = [
   { key: 'horas', name: 'Horas', fullName: 'Reduzir em 10% o total de horas dedicadas em rotinas', meta: '−10% até jun/2026', objetivo: 1, fillColor: '#005216' },
@@ -118,7 +129,7 @@ export const ACTIONS: OkrAction[] = [
 
   // ===== KR: % retificações ≤ 1% =====
 
-  // Gestão - Retificações
+  // Gestão Operacional - Retificações
   { id: 'ge1', text: 'Levantamento das classificações, motivos, impactos e ações das retificações do último trimestre', resp: 'Bruna', prazo: 'Abr/2026', area: 'gestao', kr: 'retificacoes' },
   { id: 'ge2', text: '#retcli - devemos compartilhar com relacionamento os clientes com maior recorrência e os motivos, para ações paralelas', resp: 'Bruna', prazo: 'Abr/2026', area: 'gestao', kr: 'retificacoes', sub: true, parentId: 'ge1',
     direcionamento: 'Envio para o time de relacionamento de um relatório ou panorama geral das retificações',
@@ -142,7 +153,7 @@ export const ACTIONS: OkrAction[] = [
     direcionamento: 'Levantamento das informações de particularidades dos clientes e colocar nas observações do CRM',
   },
 
-  // Gestão - Retificações (cont.)
+  // Gestão Operacional - Retificações (cont.)
   { id: 'ge3', text: 'Ajuste do prompt da IA incluindo as Convenções Coletivas, arquivos anexados em tarefa para envio ao cliente', resp: 'Bruna', prazo: 'Mai/2026', area: 'gestao', kr: 'retificacoes' },
   { id: 'ge4', text: 'Definição de cronograma de capacitações técnicas específicas para cada membro do time, voltado para o tema de maior recorrência de retificações ou o tema de maior dúvida de cada tribo', resp: 'Bruna', prazo: 'Jun/2026', area: 'gestao', kr: 'retificacoes' },
 
@@ -151,15 +162,15 @@ export const ACTIONS: OkrAction[] = [
 
   { id: 'ge5', text: 'Fazer diagnóstico dos atendimentos negativos de 2025 e do último trimestre', resp: 'Bruna', prazo: 'Abr/2026', area: 'gestao', kr: 'ces' },
   { id: 'ge6', text: 'Aplicar treinamento para o time com base nos motivos mais recorrentes de avaliação negativa', resp: 'Bruna', prazo: 'Mai/2026', area: 'gestao', kr: 'ces' },
-  { id: 'ge7', text: 'Manter a prática de avaliar em conjunto de forma regular os tickets negativos no Zendesk', resp: 'Geral (Time)', prazo: 'Semanal', area: 'todos', kr: 'ces', recurrent: true, chips: QUINTAS, chipLabel: 'Marcar presença — quintas-feiras (a partir de 16/04)' },
+  { id: 'ge7', text: 'Manter a prática de avaliar em conjunto de forma regular os tickets negativos no Zendesk', resp: 'Geral (Time)', prazo: 'Semanal', area: 'geral', kr: 'ces', recurrent: true, chips: QUINTAS, chipLabel: 'Marcar presença — quintas-feiras (a partir de 16/04)' },
   { id: 'ge8', text: 'Mapear para relacionamento os atendimentos com avaliação negativa, a fim de proporcionar uma ação ativa da ATLC', resp: 'Bruna', prazo: 'Jun/2026', area: 'gestao', kr: 'ces' },
 
   // KR: NPS >= 75
   { id: 'ge9', text: 'Mapear os passivos da carteira com base nos últimos NPS', resp: 'Bruna', prazo: 'Abr/2026', area: 'gestao', kr: 'nps' },
   { id: 'ge10', text: 'Levantamento dos clientes que não responderam as últimas publicações de NPS', resp: 'Bruna', prazo: 'Abr/2026', area: 'gestao', kr: 'nps' },
-  { id: 'ge11', text: 'Contato estratégico com os clientes que não responderam os últimos NPS a fim de aumentar nossos promotores promovendo um bom relacionamento com os que não responderam', resp: 'Geral (Time)', prazo: 'Mai–Jun/2026', area: 'todos', kr: 'nps' },
+  { id: 'ge11', text: 'Contato estratégico com os clientes que não responderam os últimos NPS a fim de aumentar nossos promotores promovendo um bom relacionamento com os que não responderam', resp: 'Geral (Time)', prazo: 'Mai–Jun/2026', area: 'geral', kr: 'nps' },
   { id: 'ge12', text: 'Mapear para relacionamento os atendimentos com avaliação negativa no ultimo trimestre e os principais motivos', resp: 'Bruna', prazo: 'Jun/2026', area: 'gestao', kr: 'nps' },
-  { id: 'ge13', text: 'Levantar para o RADAR identificação dos clientes passivos e atividades entregues nas semanas para eles e atividades prevista para os próximos dias', resp: 'Geral (Time)', prazo: 'Semanal', area: 'gestao', kr: 'nps', recurrent: true, chips: QUINTAS, chipLabel: 'Registrar acompanhamento — quintas-feiras (a partir de 16/04)' },
+  { id: 'ge13', text: 'Levantar para o RADAR identificação dos clientes passivos e atividades entregues nas semanas para eles e atividades prevista para os próximos dias', resp: 'Geral (Time)', prazo: 'Semanal', area: 'geral', kr: 'nps', recurrent: true, chips: QUINTAS, chipLabel: 'Registrar acompanhamento — quintas-feiras (a partir de 16/04)' },
 ];
 
 export const GLOSSARIO = [
