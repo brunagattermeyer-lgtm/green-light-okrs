@@ -1,9 +1,18 @@
 import { useAuth } from '@/contexts/AuthContext';
 import LoginPage from '@/pages/LoginPage';
+import MainMenu from '@/pages/MainMenu';
 import Dashboard from '@/components/okr/Dashboard';
+import ContabilPage from '@/pages/ContabilPage';
+import FiscalPage from '@/pages/FiscalPage';
+import GestaoPessoasPage from '@/pages/GestaoPessoasPage';
+import GestaoOperacionalPage from '@/pages/GestaoOperacionalPage';
 import { OkrStateProvider } from '@/contexts/OkrStateContext';
 
-const Index = () => {
+interface IndexProps {
+  page?: string;
+}
+
+const Index = ({ page }: IndexProps) => {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -16,11 +25,22 @@ const Index = () => {
 
   if (!user) return <LoginPage />;
 
-  return (
-    <OkrStateProvider>
-      <Dashboard />
-    </OkrStateProvider>
-  );
+  if (!page) return <MainMenu />;
+
+  if (page === 'okrs') {
+    return (
+      <OkrStateProvider>
+        <Dashboard />
+      </OkrStateProvider>
+    );
+  }
+
+  if (page === 'contabil') return <ContabilPage />;
+  if (page === 'fiscal') return <FiscalPage />;
+  if (page === 'gestao-pessoas') return <GestaoPessoasPage />;
+  if (page === 'gestao-operacional') return <GestaoOperacionalPage />;
+
+  return <MainMenu />;
 };
 
 export default Index;

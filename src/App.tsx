@@ -18,6 +18,11 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/okrs" element={<Index page="okrs" />} />
+            <Route path="/contabil" element={<Index page="contabil" />} />
+            <Route path="/fiscal" element={<Index page="fiscal" />} />
+            <Route path="/gestao-pessoas" element={<Index page="gestao-pessoas" />} />
+            <Route path="/gestao-operacional" element={<Index page="gestao-operacional" />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

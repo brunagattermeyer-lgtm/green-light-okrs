@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ACTIONS, AREAS, KRS, OBJETIVOS, GLOSSARIO, CRONOGRAMA, KrKey, AreaKey } from '@/data/okrData';
+import { useNavigate } from 'react-router-dom';
+import { ACTIONS, AREAS, KRS, OBJETIVOS, CRONOGRAMA, KrKey, AreaKey } from '@/data/okrData';
 import { useOkrState } from '@/contexts/OkrStateContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { calcOverallProgress, calcProgressByKr, calcProgressByArea } from '@/lib/progressCalc';
@@ -18,7 +19,7 @@ import SpreadsheetImportModal from '@/components/okr/SpreadsheetImportModal';
 import logoAtlc from '@/assets/logo-atlc-cropped.png';
 
 const QUARTERS = [
-  { label: '1Q2026', period: 'Janeiro — Marco 2026' },
+  { label: '1Q2026', period: 'Janeiro — Março 2026' },
   { label: '2Q2026', period: 'Abril — Junho 2026' },
   { label: '3Q2026', period: 'Julho — Setembro 2026' },
   { label: '4Q2026', period: 'Outubro — Dezembro 2026' },
@@ -27,6 +28,7 @@ const QUARTERS = [
 const Dashboard: React.FC = () => {
   const { actionStates, chipStates, loading } = useOkrState();
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [activeArea, setActiveArea] = useState<AreaKey | null>(null);
   const [showObjetivos, setShowObjetivos] = useState(false);
   const [showKrList, setShowKrList] = useState(false);
@@ -69,50 +71,59 @@ const Dashboard: React.FC = () => {
     <div className="min-h-screen bg-okr-bg">
       <div className="max-w-[1100px] mx-auto px-4 sm:px-6 py-8 sm:py-10 pb-20">
         {/* User bar */}
-        <div className="flex items-center justify-end gap-3 mb-6 text-xs text-okr-lt">
-          <span>{user?.email}</span>
-          <button onClick={signOut} className="px-3 py-1 rounded bg-okr-bl hover:bg-okr-bo transition-colors text-okr-mi">
-            Sair
+        <div className="flex items-center justify-between gap-3 mb-6 text-xs text-okr-lt">
+          <button
+            onClick={() => navigate('/')}
+            className="flex items-center gap-1.5 text-xs text-okr-mi hover:text-okr-dk transition-colors"
+          >
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            Voltar ao menu
           </button>
-          <div className="relative">
-            <button
-              onClick={() => setShowMenu(!showMenu)}
-              className="px-2 py-1 rounded bg-okr-bl hover:bg-okr-bo transition-colors text-okr-mi text-sm font-bold"
-            >
-              ...
+          <div className="flex items-center gap-3">
+            <span>{user?.email}</span>
+            <button onClick={signOut} className="px-3 py-1 rounded bg-okr-bl hover:bg-okr-bo transition-colors text-okr-mi">
+              Sair
             </button>
-            {showMenu && (
-              <>
-                <div className="fixed inset-0 z-30" onClick={() => setShowMenu(false)} />
-                <div className="absolute right-0 top-full mt-1 bg-okr-su border border-okr-bl rounded-lg shadow-modal z-40 min-w-[180px]">
-                  <button
-                    onClick={() => { setShowLog(true); setShowMenu(false); }}
-                    className="w-full text-left px-4 py-2.5 text-xs text-okr-dk hover:bg-okr-bl transition-colors rounded-t-lg"
-                  >
-                    Mostrar log
-                  </button>
-                  <button
-                    onClick={() => { setShowSpreadsheets(true); setShowMenu(false); }}
-                    className="w-full text-left px-4 py-2.5 text-xs text-okr-dk hover:bg-okr-bl transition-colors"
-                  >
-                    Planilhas importadas
-                  </button>
-                  <button
-                    onClick={() => { setShowCreateAction(true); setShowMenu(false); }}
-                    className="w-full text-left px-4 py-2.5 text-xs text-okr-dk hover:bg-okr-bl transition-colors rounded-b-lg"
-                  >
-                    Nova acao
-                  </button>
-                </div>
-              </>
-            )}
+            <div className="relative">
+              <button
+                onClick={() => setShowMenu(!showMenu)}
+                className="px-2 py-1 rounded bg-okr-bl hover:bg-okr-bo transition-colors text-okr-mi text-sm font-bold"
+              >
+                ...
+              </button>
+              {showMenu && (
+                <>
+                  <div className="fixed inset-0 z-30" onClick={() => setShowMenu(false)} />
+                  <div className="absolute right-0 top-full mt-1 bg-okr-su border border-okr-bl rounded-lg shadow-modal z-40 min-w-[180px]">
+                    <button
+                      onClick={() => { setShowLog(true); setShowMenu(false); }}
+                      className="w-full text-left px-4 py-2.5 text-xs text-okr-dk hover:bg-okr-bl transition-colors rounded-t-lg"
+                    >
+                      Mostrar log
+                    </button>
+                    <button
+                      onClick={() => { setShowSpreadsheets(true); setShowMenu(false); }}
+                      className="w-full text-left px-4 py-2.5 text-xs text-okr-dk hover:bg-okr-bl transition-colors"
+                    >
+                      Planilhas importadas
+                    </button>
+                    <button
+                      onClick={() => { setShowCreateAction(true); setShowMenu(false); }}
+                      className="w-full text-left px-4 py-2.5 text-xs text-okr-dk hover:bg-okr-bl transition-colors rounded-b-lg"
+                    >
+                      Nova ação
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Header */}
         <div className="mb-8">
-          <div className="flex flex-col items-start gap-2 mb-2">
-            <img src={logoAtlc} alt="ATLC Igrejas" className="h-14" />
+          <div className="flex flex-col items-center gap-2 mb-2">
+            <img src={logoAtlc} alt="ATLC Igrejas" className="h-16" />
             <div className="relative">
               <button
                 onClick={() => setShowQuarterDropdown(!showQuarterDropdown)}
@@ -124,7 +135,7 @@ const Dashboard: React.FC = () => {
               {showQuarterDropdown && (
                 <>
                   <div className="fixed inset-0 z-30" onClick={() => setShowQuarterDropdown(false)} />
-                  <div className="absolute left-0 top-full mt-1 bg-okr-su border border-okr-bl rounded-lg shadow-modal z-40 min-w-[160px] py-1">
+                  <div className="absolute left-1/2 -translate-x-1/2 top-full mt-1 bg-okr-su border border-okr-bl rounded-lg shadow-modal z-40 min-w-[160px] py-1">
                     {QUARTERS.map((q, i) => (
                       <button
                         key={q.label}
@@ -141,8 +152,8 @@ const Dashboard: React.FC = () => {
               )}
             </div>
           </div>
-          <h1 className="text-[26px] font-semibold text-okr-dk tracking-tight">OKRs — Gestao Operacional</h1>
-          <p className="text-sm text-okr-mi mt-1">{quarter.period} · 2 objetivos · 4 resultados-chave</p>
+          <h1 className="text-[26px] font-semibold text-okr-dk tracking-tight text-center">OKRs — Gestão Operacional</h1>
+          <p className="text-sm text-okr-mi mt-1 text-center">{quarter.period} · 2 objetivos · 4 resultados-chave</p>
         </div>
 
         {/* Dashboard / Charts tabs */}
@@ -161,7 +172,7 @@ const Dashboard: React.FC = () => {
               activeTab === 'charts' ? 'bg-okr-su text-okr-dk shadow-sm' : 'text-okr-mi hover:text-okr-dk'
             }`}
           >
-            Graficos
+            Gráficos
           </button>
         </div>
 
@@ -169,13 +180,13 @@ const Dashboard: React.FC = () => {
           <>
             {/* Metric cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
-              <MetricCard label="OBJETIVOS" value="2" sub="Confiabilidade · Experiencia" hint="Ver objetivos" onClick={() => setShowObjetivos(true)} />
-              <MetricCard label="RESULTADOS-CHAVE" value="4" sub="Horas · Retificacoes · CES · NPS" hint="Ver resultados-chave" onClick={() => setShowKrList(true)} />
-              <MetricCard label="ACOES TOTAIS" value={String(overall.actionCount)} sub={`${overall.actionDone} concluidas`} hint="Ver todas as acoes" onClick={() => setShowAllActions(true)} />
+              <MetricCard label="OBJETIVOS" value="2" sub="Confiabilidade · Experiência" hint="Ver objetivos" onClick={() => setShowObjetivos(true)} />
+              <MetricCard label="RESULTADOS-CHAVE" value="4" sub="Horas · Retificações · CES · NPS" hint="Ver resultados-chave" onClick={() => setShowKrList(true)} />
+              <MetricCard label="AÇÕES TOTAIS" value={String(overall.actionCount)} sub={`${overall.actionDone} concluídas`} hint="Ver todas as ações" onClick={() => setShowAllActions(true)} />
               <div className="bg-okr-dk rounded-xl p-[18px_20px] shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] hover:shadow-[0_4px_16px_rgba(13,38,1,0.12),0_8px_32px_rgba(13,38,1,0.08)] hover:-translate-y-0.5 transition-all duration-300 cursor-default">
                 <div className="text-[11px] font-medium text-[#5fa867] uppercase tracking-wider mb-1.5">PROGRESSO GERAL</div>
                 <div className="text-[28px] font-semibold text-[#a8e89c] leading-none">{overall.percent}%</div>
-                <div className="text-xs text-[#6b9b73] mt-1">{overall.actionDone} de {overall.actionCount} acoes concluidas</div>
+                <div className="text-xs text-[#6b9b73] mt-1">{overall.actionDone} de {overall.actionCount} ações concluídas</div>
               </div>
             </div>
 
@@ -200,14 +211,14 @@ const Dashboard: React.FC = () => {
                     <p className="text-[13px] font-medium text-okr-dk mb-1">{kr.fullName}</p>
                     <p className="text-[11px] text-okr-mi mb-2">Objetivo {kr.objetivo} · Meta: {kr.meta}</p>
                     <ProgressBar percent={p.percent} fillColor="#005216" height={8} />
-                    <p className="text-[11px] text-okr-lt mt-2">{p.actionDone} de {p.actionCount} acoes concluidas</p>
+                    <p className="text-[11px] text-okr-lt mt-2">{p.actionDone} de {p.actionCount} ações concluídas</p>
                   </button>
                 );
               })}
             </div>
 
             {/* Area Progress */}
-            <SectionLabel>Visao por area</SectionLabel>
+            <SectionLabel>Visão por área</SectionLabel>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
               {AREAS.filter(a => a.key !== 'todos').map(area => {
                 const p = calcProgressByArea(area.key, actionStates, chipStates);
@@ -222,7 +233,7 @@ const Dashboard: React.FC = () => {
                       <span className="text-sm font-medium text-okr-dk">{area.name}</span>
                     </div>
                     <div className="text-lg font-semibold text-okr-dk mb-1">{p.percent}%</div>
-                    <p className="text-[11px] text-okr-lt mb-2">{p.actionDone} de {p.actionCount} acoes concluidas</p>
+                    <p className="text-[11px] text-okr-lt mb-2">{p.actionDone} de {p.actionCount} ações concluídas</p>
                     <ProgressBar percent={p.percent} fillColor={area.color} height={5} />
                   </button>
                 );
@@ -249,21 +260,6 @@ const Dashboard: React.FC = () => {
                   </ul>
                 </div>
               ))}
-            </div>
-
-            {/* Glossario */}
-            <SectionLabel>Glossario</SectionLabel>
-            <div className="bg-okr-su rounded-xl shadow-[0_2px_8px_rgba(13,38,1,0.08),0_6px_20px_rgba(13,38,1,0.06)] overflow-hidden mb-8 border border-transparent">
-              <table className="w-full">
-                <tbody>
-                  {GLOSSARIO.map((g, i) => (
-                    <tr key={g.termo} className={i > 0 ? 'border-t border-okr-bl' : ''}>
-                      <td className="px-4 py-3 text-xs font-bold text-okr-dk w-32 align-top">{g.termo}</td>
-                      <td className="px-4 py-3 text-[13px] text-okr-mi">{g.def}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
           </>
         )}
