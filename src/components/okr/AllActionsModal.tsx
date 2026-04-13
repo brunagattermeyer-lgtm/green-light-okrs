@@ -28,12 +28,12 @@ const AllActionsModal: React.FC<{ open: boolean; onClose: () => void }> = ({ ope
   const filters: { key: typeof filter; label: string }[] = [
     { key: 'all', label: 'Todas' },
     { key: 'pending', label: 'Pendentes' },
-    { key: 'done', label: 'Concluidas' },
+    { key: 'done', label: 'Concluídas' },
     { key: 'overdue', label: 'Em atraso' },
   ];
 
   return (
-    <Modal open={open} onClose={onClose} title="Todas as acoes">
+    <Modal open={open} onClose={onClose} title="Todas as ações">
       <div className="flex gap-2 mb-4">
         {filters.map(f => (
           <button
@@ -63,7 +63,7 @@ const AllActionsModal: React.FC<{ open: boolean; onClose: () => void }> = ({ ope
                 isOverdue && !isDone ? 'bg-red-50' : ''
               }`}
             >
-              <span className={`text-[13px] text-okr-dk flex-1 min-w-0 mr-3 ${isDone ? 'line-through opacity-60' : ''}`}>
+              <span className={`text-[13px] flex-1 min-w-0 mr-3 ${isDone ? 'text-okr-lt underline' : 'text-okr-dk'}`}>
                 {action.text}
               </span>
               <div className="flex items-center gap-2 flex-shrink-0">
@@ -83,7 +83,7 @@ const AllActionsModal: React.FC<{ open: boolean; onClose: () => void }> = ({ ope
         })}
       </div>
       {sorted.length === 0 && (
-        <p className="text-center text-okr-lt text-sm py-8">Nenhuma acao encontrada.</p>
+        <p className="text-center text-okr-lt text-sm py-8">Nenhuma ação encontrada.</p>
       )}
     </Modal>
   );

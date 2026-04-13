@@ -30,7 +30,7 @@ const KrDetailModal: React.FC<KrDetailModalProps> = ({ krKey, open, onClose }) =
       <div className="mb-4">
         <div className="flex items-center gap-3 mb-2">
           <span className="text-2xl text-okr-dk">{p.percent}%</span>
-          <span className="text-sm text-okr-mi">{p.actionDone} de {p.actionCount} acoes concluidas</span>
+          <span className="text-sm text-okr-mi">{p.actionDone} de {p.actionCount} ações concluídas</span>
         </div>
         <ProgressBar percent={p.percent} fillColor={kr.fillColor} />
         <p className="text-[11px] text-okr-lt mt-2">Objetivo {kr.objetivo} · Meta: {kr.meta}</p>
@@ -49,8 +49,8 @@ const KrDetailModal: React.FC<KrDetailModalProps> = ({ krKey, open, onClose }) =
                 ? (action.chips?.every((_, i) => chipStates[`${action.id}_${i}`]) ?? false)
                 : !!actionStates[action.id];
               return (
-                <div key={action.id} className={`flex items-center justify-between py-2 px-3 ${action.sub ? 'ml-5' : ''} ${isDone ? 'opacity-60' : ''}`}>
-                  <span className={`text-[13px] text-okr-dk flex-1 ${isDone ? 'line-through' : ''}`}>
+                <div key={action.id} className={`flex items-center justify-between py-2 px-3 ${action.sub ? 'ml-5' : ''}`}>
+                  <span className={`text-[13px] flex-1 ${isDone ? 'text-okr-lt underline' : 'text-okr-dk'}`}>
                     {action.sub && '↳ '}{action.text}
                   </span>
                   <span className="text-[10px] text-okr-lt ml-2 flex-shrink-0">{action.prazo}</span>

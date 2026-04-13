@@ -27,13 +27,31 @@ const AreaModal: React.FC<AreaModalProps> = ({ area, open, onClose }) => {
   const alerts = getDeadlineAlerts(actionStates, chipStates);
   const overdueIds = new Set(alerts.filter(a => a.type === 'overdue').map(a => a.action.id));
 
-  // Fetch custom actions for this area
-  useEffect(() => {
+  const fetchCustomActions = () => {
     if (!open) return;
     supabase.from('custom_actions').select('*').eq('area', area).then(({ data }) => {
       setCustomActions(data || []);
     });
+  };
+
+  useEffect(() => {
+    fetchCustomActions();
   }, [open, area]);
+
+  const handleDeleteCustomAction = async (id: string) => {
+    const { error } = await supabase.from('custom_actions').delete().eq('id', id);
+    if (!error) {
+      setCustomActions(prev => prev.filter(a => a.id !== id));
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email) {
+        await supabase.from('activity_log').insert({
+          user_email: user.email,
+          action_text: 'Ação removida',
+          action_type: 'action_deleted',
+        });
+      }
+    }
+  };
 
   const filtered = actions.filter(a => {
     const isDone = a.recurrent
@@ -53,7 +71,7 @@ const AreaModal: React.FC<AreaModalProps> = ({ area, open, onClose }) => {
 
   const krLabels: Record<string, string> = {
     horas: 'REDUZIR EM 10% O TOTAL DE HORAS DEDICADAS EM ROTINAS',
-    retificacoes: '% RETIFICACOES <= 1%',
+    retificacoes: '% RETIFICAÇÕES <= 1%',
     ces: 'MANTER O CES DO TRIMESTRE EM 4,0 PONTOS',
     nps: 'NPS >= 75',
   };
@@ -61,7 +79,7 @@ const AreaModal: React.FC<AreaModalProps> = ({ area, open, onClose }) => {
   const filters: { key: typeof filter; label: string }[] = [
     { key: 'all', label: 'Todas' },
     { key: 'pending', label: 'Pendentes' },
-    { key: 'done', label: 'Concluidas' },
+    { key: 'done', label: 'Concluídas' },
     { key: 'overdue', label: 'Em atraso' },
   ];
 
@@ -77,11 +95,11 @@ const AreaModal: React.FC<AreaModalProps> = ({ area, open, onClose }) => {
           <div className="flex items-center gap-6 mb-3">
             <div className="text-center">
               <div className="text-2xl font-semibold text-okr-dk">{progress.actionCount}</div>
-              <div className="text-[10px] text-okr-lt uppercase tracking-wider">Acoes</div>
+              <div className="text-[10px] text-okr-lt uppercase tracking-wider">Ações</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-semibold text-okr-dk">{progress.actionDone}</div>
-              <div className="text-[10px] text-okr-lt uppercase tracking-wider">Concluidas</div>
+              <div className="text-[10px] text-okr-lt uppercase tracking-wider">Concluídas</div>
             </div>
             <div className="flex-1">
               <div className="flex items-center justify-between mb-1">
@@ -114,7 +132,7 @@ const AreaModal: React.FC<AreaModalProps> = ({ area, open, onClose }) => {
             onClick={() => setShowCreateForm(true)}
             className="px-3 py-1 rounded-full text-xs font-medium bg-okr-fo text-white hover:bg-okr-dk transition-colors"
           >
-            + Nova acao
+            + Nova ação
           </button>
         </div>
 
@@ -135,11 +153,11 @@ const AreaModal: React.FC<AreaModalProps> = ({ area, open, onClose }) => {
         {customActions.length > 0 && (
           <div className="mb-5">
             <div className="text-[11px] font-medium text-okr-lt uppercase tracking-wider mb-3 pb-2 border-b border-okr-bl">
-              Acoes adicionadas
+              Ações adicionadas
             </div>
             <div className="space-y-1">
               {customActions.map(ca => (
-                <div key={ca.id} className="flex items-center justify-between p-3 rounded-lg">
+                <div key={ca.id} className="flex items-center justify-between p-3 rounded-lg border border-transparent hover:border-okr-bo transition-all">
                   <div className="flex-1 min-w-0">
                     <p className="text-[13px] font-medium text-okr-dk">{ca.action_text}</p>
                     <div className="flex items-center gap-1.5 mt-1">
@@ -151,11 +169,21 @@ const AreaModal: React.FC<AreaModalProps> = ({ area, open, onClose }) => {
                       </span>
                       {ca.is_action_plan && (
                         <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-amber-100 text-amber-700">
-                          Plano de acao
+                          Plano de ação
                         </span>
                       )}
                     </div>
+                    {ca.direcionamento && (
+                      <p className="text-[11px] text-okr-lt mt-1.5 italic">{ca.direcionamento}</p>
+                    )}
                   </div>
+                  <button
+                    onClick={() => handleDeleteCustomAction(ca.id)}
+                    className="ml-2 text-okr-lt hover:text-red-500 transition-colors text-xs flex-shrink-0"
+                    title="Excluir ação"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 4L12 12M12 4L4 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                  </button>
                 </div>
               ))}
             </div>
@@ -163,7 +191,7 @@ const AreaModal: React.FC<AreaModalProps> = ({ area, open, onClose }) => {
         )}
 
         {filtered.length === 0 && customActions.length === 0 && (
-          <p className="text-center text-okr-lt text-sm py-6">Nenhuma acao encontrada.</p>
+          <p className="text-center text-okr-lt text-sm py-6">Nenhuma ação encontrada.</p>
         )}
       </Modal>
 
@@ -172,10 +200,7 @@ const AreaModal: React.FC<AreaModalProps> = ({ area, open, onClose }) => {
           open={showCreateForm}
           onClose={() => {
             setShowCreateForm(false);
-            // Refresh custom actions
-            supabase.from('custom_actions').select('*').eq('area', area).then(({ data }) => {
-              setCustomActions(data || []);
-            });
+            fetchCustomActions();
           }}
           editData={null}
         />

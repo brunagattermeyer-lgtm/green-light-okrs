@@ -43,14 +43,12 @@ const ActionItem: React.FC<ActionItemProps> = ({ action, editable = false, areaC
     let top: number;
     let left: number;
 
-    // Position vertically: below or above
     if (spaceBelow < 250) {
-      top = rect.top - 8; // show above, will use transform
+      top = rect.top - 8;
     } else {
       top = rect.bottom + 8;
     }
 
-    // Position horizontally
     if (spaceRight < 340) {
       left = rect.left - 320;
     } else {
@@ -61,7 +59,7 @@ const ActionItem: React.FC<ActionItemProps> = ({ action, editable = false, areaC
   }, []);
 
   return (
-    <div className={`flex flex-col gap-1.5 p-3 rounded-lg transition-colors ${action.sub ? 'ml-5 bg-[#fafcfa] border-l-[3px] border-okr-bo' : ''}`}>
+    <div className={`flex flex-col gap-1.5 p-3 rounded-lg transition-all border border-transparent hover:border-okr-bo ${action.sub ? 'ml-5 bg-[#fafcfa] border-l-[3px] border-l-okr-bo' : ''}`}>
       <div className="flex items-start gap-3">
         {editable && !action.recurrent && (
           <button
@@ -87,7 +85,7 @@ const ActionItem: React.FC<ActionItemProps> = ({ action, editable = false, areaC
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className={`text-[13px] font-medium text-okr-dk ${isDone && !action.recurrent ? 'line-through opacity-60' : ''}`}>
+            <span className={`text-[13px] font-medium ${isDone && !action.recurrent ? 'text-okr-lt underline' : 'text-okr-dk'}`}>
               {action.text}
             </span>
             <div className="relative inline-flex">
@@ -111,10 +109,10 @@ const ActionItem: React.FC<ActionItemProps> = ({ action, editable = false, areaC
                     }}
                   >
                     <p><strong>Prazo:</strong> {action.prazo}</p>
-                    <p><strong>Area:</strong> {area?.name}</p>
+                    <p><strong>Área:</strong> {area?.name}</p>
                     <p><strong>KR:</strong> {kr?.fullName || kr?.name}</p>
-                    {action.sub && <p className="mt-1 text-[10px] opacity-75">Subtask — contribui para o progresso da acao principal</p>}
-                    {action.recurrent && <p className="mt-1 text-[10px] opacity-75">Acao recorrente — progresso por chips</p>}
+                    {action.sub && <p className="mt-1 text-[10px] opacity-75">Subtask — contribui para o progresso da ação principal</p>}
+                    {action.recurrent && <p className="mt-1 text-[10px] opacity-75">Ação recorrente — progresso por chips</p>}
                     {action.direcionamento && (
                       <div className="mt-2 pt-2 border-t border-[#2a4a1a]">
                         <p className="text-[10px] uppercase tracking-wider text-[#7dcc6d] font-semibold mb-1">Direcionamento Operacional</p>
@@ -123,7 +121,7 @@ const ActionItem: React.FC<ActionItemProps> = ({ action, editable = false, areaC
                     )}
                     {action.expectativas && action.expectativas.length > 0 && (
                       <div className="mt-2 pt-2 border-t border-[#2a4a1a]">
-                        <p className="text-[10px] uppercase tracking-wider text-[#7dcc6d] font-semibold mb-1">Expectativas / Criterios</p>
+                        <p className="text-[10px] uppercase tracking-wider text-[#7dcc6d] font-semibold mb-1">Expectativas / Critérios</p>
                         <ul className="space-y-0.5">
                           {action.expectativas.map((e, i) => (
                             <li key={i} className="text-[11px] leading-relaxed flex items-start gap-1.5">
