@@ -1,5 +1,7 @@
 import { ACTIONS, OkrAction, AreaKey, KrKey } from '@/data/okrData';
 
+// Re-export for convenience
+
 export interface ActionStates {
   [actionId: string]: boolean;
 }
